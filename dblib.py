@@ -9,12 +9,13 @@ class LostFoundDatabase:
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
         cur.execute("""
-            create table if not exists users (
+                create table if not exists users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL
-            );
-            create table if not exists reports (
+                );
+                """)
+        cur.execute("""create table if not exists reports (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 pet_name TEXT NOT NULL,
@@ -24,8 +25,7 @@ class LostFoundDatabase:
                 description TEXT,
                 photo_path TEXT,
                 FOREIGN KEY (user_id) REFERENCES users (id)
-            );
-            """)
+            );""")
         conn.commit()
         conn.close()
 
@@ -53,13 +53,14 @@ class LostFoundDatabase:
 
         return user_list
     
-    def get_userpass_by_username(self, username):
+    def get_userpass_by_username(self, username, password):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
-        cur.execute("SELECT password FROM users WHERE username = ?", (username,))
-        userpass = cur.fetchall()
+        cur.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+        user = cur.fetchone()
+        print(f"DEBUG: Username: {username}, Password: {password}, Query Result: {user}")  # Hata ayıklama
         conn.close()
-        return userpass
+        return user
     
     def get_reports(self):
         conn = sqlite3.connect(self.db_name)
