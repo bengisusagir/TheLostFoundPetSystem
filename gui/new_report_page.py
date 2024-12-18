@@ -1,26 +1,22 @@
 import sqlite3
-from tkinter import Tk, Label, Entry, Button, Text, filedialog, StringVar, messagebox
+from tkinter import Tk, Label, Entry, Button, Text, Toplevel, filedialog, StringVar, messagebox
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import dblib
 
 class ReportApp:
-    def __init__(self, root):
+    def __init__(self, user_id):
         self.root = root
         self.root.title("New Report Page")
-        
         self.db_name = "dblib.db"  
         self.db = dblib.LostFoundDatabase()
-        self.user_id = StringVar()
+        self.user_id = StringVar(value=user_id)
         self.pet_name = StringVar()
         self.pet_type = StringVar()
         self.location = StringVar()
         self.photo_path = StringVar()
-
-        Label(root, text="User ID:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        Entry(root, textvariable=self.user_id).grid(row=0, column=1, padx=10, pady=5)
-
+        print("welcome"+user_id)
         Label(root, text="Pet Name:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         Entry(root, textvariable=self.pet_name).grid(row=1, column=1, padx=10, pady=5)
 
