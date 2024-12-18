@@ -13,6 +13,7 @@ class LostFoundDatabase:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL
+                phoneNo TEXT NOT NULL
                 );
                 """)
         cur.execute("""create table if not exists reports (
@@ -29,10 +30,10 @@ class LostFoundDatabase:
         conn.commit()
         conn.close()
 
-    def save_user(self, username, password):
+    def save_user(self, username, password,phoneNo):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
-        cur.execute("insert into users (username, password) values (?, ?)", (username, password))
+        cur.execute("insert into users (username, password,phoneNo) values (?, ?,?)", (username, password, phoneNo))
         conn.commit()
         conn.close()
         
@@ -53,13 +54,13 @@ class LostFoundDatabase:
         conn.close()
 
         return user_list
+
     
     def get_userpass_by_username(self, username, password):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
         cur.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
         user = cur.fetchone()
-        print(f"DEBUG: Username: {username}, Password: {password}, Query Result: {user}")  # Hata ayıklama
         conn.close()
         return user
     
@@ -69,8 +70,16 @@ class LostFoundDatabase:
         cur.execute("select * from reports")
         report_list = cur.fetchall()
         conn.close()
-
         return report_list
+        
+    def get_reportdetails(self,report_id):
+        conn = sqlite3.connect(self.db_name)
+        cur = conn.cursor()
+        cur.execute("select * from reports where report_id= ?")
+        reportdetails = cur.fetchall()
+        conn.close()
+        return reportdetails
+    
     def get_reports_by_user(self, user_id):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
