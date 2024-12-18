@@ -12,7 +12,7 @@ class LostFoundDatabase:
                 create table if not exists users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
                 phoneNo TEXT NOT NULL
                 );
                 """)
@@ -21,10 +21,9 @@ class LostFoundDatabase:
                 user_id INTEGER NOT NULL,
                 pet_name TEXT NOT NULL,
                 pet_type TEXT NOT NULL,
-                pet_color TEXT NOT NULL,
                 location TEXT NOT NULL,
-                description TEXT,
-                photo_path TEXT,
+                description TEXT NOT NULL,
+                photo_path TEXT NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (id)
             );""")
         conn.commit()
@@ -37,10 +36,10 @@ class LostFoundDatabase:
         conn.commit()
         conn.close()
         
-    def save_report(self, user_id, pet_name, pet_type,pet_color,location,description,photo_path):
+    def save_report(self, user_id, pet_name, pet_type,location,description,photo_path):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
-        cur.execute("insert into reports (user_id, pet_name, pet_type,pet_color,location,description,photo_path) values (?, ?, ?,?,?,?,?)", (user_id, pet_name, pet_type,pet_color,location,description,photo_path))
+        cur.execute("insert into reports (user_id, pet_name, pet_type,location,description,photo_path) values (?, ?,?,?,?,?)", (user_id, pet_name, pet_type,location,description,photo_path))
         conn.commit()
         conn.close()
         
@@ -101,7 +100,7 @@ class LostFoundDatabase:
         conn.commit()
         conn.close()
         
-    def update_report(self, report_id, pet_name=None, pet_type=None, pet_color=None, location=None, description=None, photo_path=None):
+    def update_report(self, report_id, pet_name=None, pet_type=None, location=None, description=None, photo_path=None):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
     
@@ -114,9 +113,6 @@ class LostFoundDatabase:
         if pet_type:
             update_fields.append("pet_type = ?")
             values.append(pet_type)
-        if pet_color:
-            update_fields.append("pet_color = ?")
-            values.append(pet_color)
         if location:
             update_fields.append("location = ?")
             values.append(location)
