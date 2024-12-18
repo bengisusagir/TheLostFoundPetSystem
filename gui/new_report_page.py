@@ -11,12 +11,12 @@ class ReportApp:
         self.root.title("New Report Page")
         self.db_name = "dblib.db"  
         self.db = dblib.LostFoundDatabase()
-        self.user_id = StringVar(value=user_id)
+        self.user_id = user_id
         self.pet_name = StringVar()
         self.pet_type = StringVar()
         self.location = StringVar()
         self.photo_path = StringVar()
-        print("welcome"+str(user_id))
+        print("welcome"+str(self.user_id))
         Label(root, text="Pet Name:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         Entry(root, textvariable=self.pet_name).grid(row=1, column=1, padx=10, pady=5)
 
@@ -43,19 +43,18 @@ class ReportApp:
             self.photo_path.set(file_path)
 
     def save_report(self):
-        user_id = self.user_id.get()
         pet_name = self.pet_name.get()
         pet_type = self.pet_type.get()
         location = self.location.get()
         description = self.description_text.get("1.0", "end-1c")
         photo_path = self.photo_path.get()
 
-        if not (user_id and pet_name and pet_type and location and description and photo_path):
+        if not (self.user_id and pet_name and pet_type and location and description and photo_path):
             messagebox.showerror("Error", "All fields are required!")
             return
 
         try:
-            self.db.save_report(user_id, pet_name, pet_type, location, description, photo_path)
+            self.db.save_report(self.user_id, pet_name, pet_type, location, description, photo_path)
             messagebox.showinfo("Success", f"Report Saved, {pet_name}!")
 
         except Exception as e:
@@ -63,5 +62,4 @@ class ReportApp:
 
 if __name__ == "__main__":
     root = Tk()
-    app = ReportApp(root)
     root.mainloop()

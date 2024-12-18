@@ -71,10 +71,10 @@ class LostFoundDatabase:
         conn.close()
         return report_list
         
-    def get_reportdetails(self,report_id):
+    def get_reportdetails(self,id):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
-        cur.execute("select * from reports where report_id= ?")
+        cur.execute("select * from reports where id= ?", (id,))
         reportdetails = cur.fetchall()
         conn.close()
         return reportdetails
@@ -90,7 +90,7 @@ class LostFoundDatabase:
     def delete_report(self, id):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
-        cur.execute("delete from reports where id=?", (id))
+        cur.execute("delete from reports where id=?", (id,))
         conn.commit()
         conn.close()
     def delete_user(self, id):
