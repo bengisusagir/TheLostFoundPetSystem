@@ -58,10 +58,10 @@ class LostFoundDatabase:
     def get_userpass_by_username(self, username, password):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
-        cur.execute("SELECT id FROM users WHERE username = ? AND password = ?", (username, password))
-        user_id = cur.fetchone()
+        cur.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+        user = cur.fetchone()
         conn.close()
-        return user_id
+        return user
     
     def get_reports(self):
         conn = sqlite3.connect(self.db_name)
