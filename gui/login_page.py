@@ -41,7 +41,9 @@ class App(tk.Tk):
             
             if user_id:
                 messagebox.showinfo("Success", f"Welcome, {username}!")
+                self.destroy()
                 AllReportsPage(user_id)
+                
                 
             else:
                 messagebox.showerror("Error", "Invalid username or password.")    
