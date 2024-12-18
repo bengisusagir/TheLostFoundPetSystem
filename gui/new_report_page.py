@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import dblib
 
 class ReportApp:
-    def __init__(self, user_id):
+    def __init__(self, root, user_id):
         self.root = root
         self.root.title("New Report Page")
         self.db_name = "dblib.db"  
@@ -16,7 +16,7 @@ class ReportApp:
         self.pet_type = StringVar()
         self.location = StringVar()
         self.photo_path = StringVar()
-        print("welcome"+user_id)
+        print("welcome"+str(user_id))
         Label(root, text="Pet Name:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         Entry(root, textvariable=self.pet_name).grid(row=1, column=1, padx=10, pady=5)
 

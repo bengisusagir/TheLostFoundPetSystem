@@ -1,6 +1,12 @@
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
+import sys
+import os
+from all_reports_page import AllReportsPage
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import dblib
 
 # Ana Uygulama Sınıfı
@@ -31,9 +37,12 @@ class App(tk.Tk):
             self.db.get_users()
             username = username_entry.get()
             password = password_entry.get()
-            user = self.db.get_userpass_by_username(username, password)
-            if user:
+            user_id = self.db.get_userpass_by_username(username, password)
+            
+            if user_id:
                 messagebox.showinfo("Success", f"Welcome, {username}!")
+                AllReportsPage(user_id)
+                
             else:
                 messagebox.showerror("Error", "Invalid username or password.")    
               
@@ -57,12 +66,18 @@ class App(tk.Tk):
         password_entry = tk.Entry(self, show="*", width=30)
         password_entry.pack()
 
+        tk.Label(self, text="Phone Number:").pack()
+        phoneNo_entry = tk.Entry(self, width=30)
+        phoneNo_entry.pack()
+
+
         def register_action():
-            username = username_entry.get()
+            username = username_entry.get() 
             password = password_entry.get()
+            phoneNo = phoneNo_entry.get()
             if username and password:
                 try:
-                    self.db.save_user(username, password)
+                    self.db.save_user(username, password, phoneNo)
                     messagebox.showinfo("Success", "Registration successful!")
                     self.show_login_page()
                 except sqlite3.IntegrityError:

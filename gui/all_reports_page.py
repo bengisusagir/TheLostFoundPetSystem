@@ -1,20 +1,22 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import StringVar, ttk, messagebox
 import sqlite3
 import sys
 import os
+from new_report_page import ReportApp
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import dblib
 
 class AllReportsPage(tk.Tk):
-    def __init__(self):
+    def __init__(self,user_id):
         super().__init__()
         self.title("Lost & Found Pet System - All Reports")
         self.geometry("1000x600")
         self.resizable(False, False)
         self.db = dblib.LostFoundDatabase()
+        self.user_id = StringVar(value=user_id)
         self.create_menu()
         self.create_table_layout()
 
@@ -56,13 +58,13 @@ class AllReportsPage(tk.Tk):
       
         for report in reportInfo:
             # İlan Detayları
-            tk.Label(content_frame, text=f"Name: {report['pet_name']}", font=("Arial", 12)).grid(row=row_num, column=1, sticky="w", padx=10, pady=5)
-            tk.Label(content_frame, text=f"Type: {report['pet_type']}", font=("Arial", 12)).grid(row=row_num, column=2, sticky="w", padx=10, pady=5)
-            tk.Label(content_frame, text=f"Location: {report['location']}", font=("Arial", 12)).grid(row=row_num + 1, column=1, sticky="w", padx=10, pady=5)
-            tk.Label(content_frame, text=f"Description: {report['description']}", font=("Arial", 12)).grid(row=row_num + 1, column=2, sticky="w", padx=10, pady=5)
+            tk.Label(content_frame, text=f"Name: {report[2]}", font=("Arial", 12)).grid(row=row_num, column=1, sticky="w", padx=10, pady=5)
+            tk.Label(content_frame, text=f"Type: {report[3]}", font=("Arial", 12)).grid(row=row_num, column=2, sticky="w", padx=10, pady=5)
+            tk.Label(content_frame, text=f"Location: {report[4]}", font=("Arial", 12)).grid(row=row_num + 1, column=1, sticky="w", padx=10, pady=5)
+            tk.Label(content_frame, text=f"Description: {report[5]}", font=("Arial", 12)).grid(row=row_num + 1, column=2, sticky="w", padx=10, pady=5)
 
             # Fotoğraf Yer Tutucu
-            tk.Label(content_frame, text=report['photo_path'], bg="gray", width=20, height=5).grid(row=row_num, column=3, rowspan=2, sticky="nsew", padx=10, pady=5)
+            tk.Label(content_frame, text=report[6], bg="gray", width=20, height=5).grid(row=row_num, column=3, rowspan=2, sticky="nsew", padx=10, pady=5)
 
             # Çizgi (Separator)
             separator = ttk.Separator(content_frame, orient="horizontal")
@@ -75,8 +77,9 @@ class AllReportsPage(tk.Tk):
 
     # Menü İşlevleri
     def new_report(self):
-        messagebox.showinfo("New Report", "Navigate to New Report Page")
-
+        new_report_window = tk.Toplevel(self)
+        ReportApp(new_report_window,self.user_id)
+        
     def my_reports(self):
         messagebox.showinfo("My Reports", "Navigate to My Reports Page")
 
