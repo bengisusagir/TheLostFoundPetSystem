@@ -49,6 +49,7 @@ class LostFoundDatabase:
         cur = conn.cursor()
         cur.execute("select * from users")
         user_list = cur.fetchall()
+        print(f"DEBUG: Data: {user_list}") 
         conn.close()
 
         return user_list

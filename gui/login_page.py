@@ -28,13 +28,15 @@ class App(tk.Tk):
         password_entry.pack()
 
         def login_action():
+            self.db.get_users()
             username = username_entry.get()
             password = password_entry.get()
             user = self.db.get_userpass_by_username(username, password)
             if user:
                 messagebox.showinfo("Success", f"Welcome, {username}!")
             else:
-                messagebox.showerror("Error", "Invalid username or password.")      
+                messagebox.showerror("Error", "Invalid username or password.")    
+              
 
         login_btn = tk.Button(self, text="Login", command=login_action)
         login_btn.pack(pady=5)
