@@ -1,5 +1,6 @@
+import shutil
 import sqlite3
-from tkinter import Tk, Label, Entry, Button, Text, Toplevel, filedialog, StringVar, messagebox
+from tkinter import OptionMenu, Tk, Label, Entry, Button, Text, Toplevel, filedialog, StringVar, messagebox
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -17,12 +18,16 @@ class ReportApp:
         self.location = StringVar()
         self.photo_path = StringVar()
         print("welcome"+str(self.user_id))
+
+        self.pet_types = ["Cat", "Dog", "Bird", "Other"]
+        self.pet_type.set(self.pet_types[0]) 
+        
+
         Label(root, text="Pet Name:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
         Entry(root, textvariable=self.pet_name).grid(row=1, column=1, padx=10, pady=5)
 
         Label(root, text="Pet Type:").grid(row=2, column=0, padx=10, pady=5, sticky="w")
-        Entry(root, textvariable=self.pet_type).grid(row=2, column=1, padx=10, pady=5)
-
+        OptionMenu(root, self.pet_type, *self.pet_types).grid(row=2, column=1, padx=10, pady=5)
 
         Label(root, text="Location:").grid(row=4, column=0, padx=10, pady=5, sticky="w")
         Entry(root, textvariable=self.location).grid(row=4, column=1, padx=10, pady=5)
@@ -40,7 +45,19 @@ class ReportApp:
     def browse_file(self):
         file_path = filedialog.askopenfilename(title="Select Photo", filetypes=[("Image Files", "*.jpg;*.jpeg;*.png")])
         if file_path:
-            self.photo_path.set(file_path)
+            target_dir = "./assests/images"  
+            if not os.path.exists(target_dir):
+                os.makedirs(target_dir)
+
+            try:
+                file_name = os.path.basename(file_path)
+                new_file_path = os.path.join(target_dir, file_name)
+                shutil.copy(file_path, new_file_path)  
+
+                self.photo_path.set(new_file_path)
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to copy photo: {str(e)}")
+
 
     def save_report(self):
         pet_name = self.pet_name.get()
@@ -56,6 +73,8 @@ class ReportApp:
         try:
             self.db.save_report(self.user_id, pet_name, pet_type, location, description, photo_path)
             messagebox.showinfo("Success", f"Report Saved, {pet_name}!")
+            self.root.destroy()
+            
 
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save report: {str(e)}")

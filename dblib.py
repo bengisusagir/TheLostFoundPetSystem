@@ -129,3 +129,28 @@ class LostFoundDatabase:
     
         conn.commit()
         conn.close()
+        
+    def update_user(self, user_id, username=None, password=None, phoneNo=None):
+        conn = sqlite3.connect(self.db_name)
+        cur = conn.cursor()
+    
+        update_fields = []
+        values = []
+    
+        if username:
+            update_fields.append("username = ?")
+            values.append(username)
+        if password:
+            update_fields.append("password = ?")
+            values.append(password)
+        if phoneNo:
+            update_fields.append("phoneNo = ?")
+            values.append(phoneNo)
+
+
+        values.append(user_id)
+    
+        cur.execute(f"UPDATE users SET {', '.join(update_fields)} WHERE id = ?", tuple(values))
+    
+        conn.commit()
+        conn.close()

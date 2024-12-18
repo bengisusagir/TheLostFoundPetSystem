@@ -1,5 +1,8 @@
+import shutil
 import sqlite3
-from tkinter import Tk, Label, Button, Entry, StringVar, filedialog, messagebox, ttk
+from tkinter import Image, OptionMenu, Tk, Label, Button, Entry, StringVar, filedialog, messagebox, ttk
+from tkinter import ttk  # Import ttk for the style
+from tkinter import PhotoImage 
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -20,6 +23,7 @@ class ReportDetails:
         
         self.report_id = report_id
         report = self.db.get_reportdetails(self.report_id)
+
         
         if report:
             Label(self.root, text="Report Details", font=("Arial", 18, "bold"), bg="lightblue").grid(row=0, column=0, columnspan=3, pady=10)
@@ -35,9 +39,10 @@ class ReportDetails:
                 self.pet_name_entry = Entry(self.root, textvariable=self.pet_name_var, width=40)
                 self.pet_name_entry.grid(row=1, column=1, padx=10, pady=5)
                 
-                self.pet_type_var = StringVar(value=report[0][3])
-                self.pet_type_entry = Entry(self.root, textvariable=self.pet_type_var, width=40)
-                self.pet_type_entry.grid(row=2, column=1, padx=10, pady=5)
+                self.pet_types = ["Dog", "Cat", "Bird", "Other"]
+                self.pet_type_var = StringVar(value=report[0][3]) 
+                self.pet_type_entry = OptionMenu(self.root, self.pet_type_var, *self.pet_types)
+                self.pet_type_entry.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
                 self.location_var = StringVar(value=report[0][4])
                 self.location_entry = Entry(self.root, textvariable=self.location_var, width=40)
@@ -53,21 +58,51 @@ class ReportDetails:
                 Button(self.root, text="Browse", command=self.browse_file).grid(row=5, column=2, padx=10, pady=5)
                 Button(self.root, text="Save", command=self.save_report, bg="green", fg="white", width=15).grid(row=6, column=1, pady=20, sticky="e")
                 
+                self.display_image(report[0][6])
+                
             else:
                 Label(self.root, text=report[0][2], bg="lightblue", anchor="w").grid(row=1, column=1, padx=10, pady=5, sticky="w")
                 Label(self.root, text=report[0][3], bg="lightblue", anchor="w").grid(row=2, column=1, padx=10, pady=5, sticky="w")
                 Label(self.root, text=report[0][4], bg="lightblue", anchor="w").grid(row=3, column=1, padx=10, pady=5, sticky="w")
                 Label(self.root, text=report[0][5], bg="lightblue", wraplength=400, justify="left").grid(row=4, column=1, padx=10, pady=5, sticky="w")
                 Label(self.root, text=os.path.basename(report[0][6]), bg="lightblue", anchor="w").grid(row=5, column=1, padx=10, pady=5, sticky="w")
+                self.display_image(report[0][6])
             
         else:
             messagebox.showerror("Error", "Report not found or is incomplete")
             self.root.destroy()
+    
+
+    def display_image(self, photo_path):
+        try:
+            # Check if the file exists
+            if os.path.exists(photo_path):
+                # Load the image using PhotoImage (only supports .png, .gif, and .ppm)
+                image = PhotoImage(file=photo_path)
+                image_label = Label(self.root, image=image, bg="lightblue")
+                image_label.grid(row=6, column=1, padx=10, pady=10)
+                image_label.image = image  # Store reference to avoid garbage collection
+            else:
+                messagebox.showerror("Error", "Image file not found!")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to load image: {str(e)}")
 
     def browse_file(self):
         file_path = filedialog.askopenfilename(title="Select Photo", filetypes=[("Image Files", "*.jpg;*.jpeg;*.png")])
         if file_path:
-            self.photo_path_var.set(file_path)
+            target_dir = "./assests/images"  
+            if not os.path.exists(target_dir):
+                os.makedirs(target_dir)
+
+            try:
+                file_name = os.path.basename(file_path)
+                new_file_path = os.path.join(target_dir, file_name)
+                shutil.copy(file_path, new_file_path)  
+
+                self.photo_path_var.set(new_file_path)
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to copy photo: {str(e)}")
+
 
     def save_report(self):
         pet_name = self.pet_name_var.get()
@@ -78,7 +113,11 @@ class ReportDetails:
 
         self.db.update_report(self.report_id, pet_name, pet_type, location, description, photo_path)
         messagebox.showinfo("Success", "Report updated successfully!")
+        self.root.destroy()
 
 if __name__ == "__main__":
     root = Tk()
+    report_id = 4
+    editable = True  
+    ReportDetails(root, report_id, editable)
     root.mainloop()

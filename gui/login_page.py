@@ -37,12 +37,12 @@ class App(tk.Tk):
             self.db.get_users()
             username = username_entry.get()
             password = password_entry.get()
-            user_id = self.db.get_userpass_by_username(username, password)
+            user = self.db.get_userpass_by_username(username, password)
             
-            if user_id:
+            if user:
                 messagebox.showinfo("Success", f"Welcome, {username}!")
                 self.destroy()
-                AllReportsPage(user_id)
+                AllReportsPage(user)
                 
                 
             else:
