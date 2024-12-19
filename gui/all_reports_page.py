@@ -1,27 +1,28 @@
 import tkinter as tk
-from tkinter import StringVar, ttk, messagebox
+from tkinter import StringVar, ttk, messagebox, Entry
 import sqlite3
 import sys
 import os
 from new_report_page import ReportApp
 from my_reports_page import MyReportsPage
+from report_details_page import ReportDetails
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import dblib
 
 class AllReportsPage(tk.Tk):
-    def __init__(self,user_id):
+    def __init__(self,user):
         super().__init__()
         self.title("Lost & Found Pet System - All Reports")
         self.geometry("1000x600")
         self.resizable(False, False)
         self.db = dblib.LostFoundDatabase()
         self.editable = False
-        if isinstance(user_id, tuple):
-            self.user_id = user_id[0]  # Tuple'dan sadece ilk elemanı alıyoruz
-        else:
-            self.user_id = user_id  # Eğer zaten integer ise olduğu gibi kullanıyoruz
+        self.user = user
+        self.user_id = user[0]
+        
+        
         self.create_menu()
         self.create_table_layout()
         
@@ -62,7 +63,7 @@ class AllReportsPage(tk.Tk):
         # 5 sütunlu grid yapısı
         for i in range(5):
             content_frame.columnconfigure(i, weight=1)
-
+        
         # Boş 1. Sütun
         tk.Label(content_frame, text="", bg="white").grid(row=0, column=0, sticky="nsew")
     
@@ -80,7 +81,10 @@ class AllReportsPage(tk.Tk):
             
             tk.Label(content_frame, text=f"Name: {report[2]}", font=("Arial", 12)).grid(row=rowNumber, column=1, sticky="w", padx=10, pady=5)
             tk.Label(content_frame, text=f"Type: {report[3]}", font=("Arial", 12)).grid(row=rowNumber + 1, column=1, sticky="w", padx=10, pady=5)
-            tk.Label(content_frame, text=f"Location: {report[4]}", font=("Arial", 12)).grid(row=rowNumber + 1, column=2, sticky="w", padx=10, pady=5)
+            tk.Label(content_frame, text=f"Location: {report[4]}", font=("Arial", 12)).grid(row=rowNumber, column=2, sticky="w", padx=10, pady=5)
+            tk.Button(content_frame, text="Details", command=lambda r=report[0]: self.report_details(r)).grid(row=rowNumber + 1, column=2, sticky="w", padx=10, pady=5)
+            if(self.editable == True):
+                tk.Button(content_frame, text="Delete", command=lambda r=report[0]: self.delete_report(r)).grid(row=rowNumber + 1, column=2, sticky="w", padx=70, pady=5)
             
 
             # Fotoğraf Yer Tutucu
@@ -114,11 +118,26 @@ class AllReportsPage(tk.Tk):
         messagebox.showinfo("Language", "Change language to TR/EN")
 
     def edit_user(self):
-        messagebox.showinfo("Edit User", "Edit user details")
+        # Yeni pencere oluştur
+        edit_user_window = tk.Toplevel(self)
+        edit_user_window.title("Edit User")
+        edit_user_window.geometry("300x250")
 
-    def delete_user(self):
+        # Kullanıcı bilgileri için alanlar
+        tk.Label(edit_user_window, text="Username:").pack(pady=5)
+        self.username_var = StringVar(value=self.user[1])
+        self.username_entry = Entry(edit_user_window, textvariable=self.username_var, width=40)
+        self.username_entry.pack()
+        
+
+
+        
+
+    def delete_user(self,user_id):
         if messagebox.askyesno("Delete User", "Are you sure you want to delete your account?"):
             messagebox.showinfo("Delete User", "User account deleted")
+            self.db.delete_user(user_id)
+
     def reset_page(self):
         for widget in self.winfo_children():
             widget.destroy()
@@ -129,6 +148,16 @@ class AllReportsPage(tk.Tk):
         self.create_menu()
         self.create_table_layout()
 
+    def report_details(self,report_id):
+        report_details_window = tk.Toplevel(self)
+        ReportDetails(report_details_window,report_id,self.editable)
+        
+    def delete_report(self,report_id):
+        if messagebox.askyesno("Delete User", "Are you sure you want to delete your account?"):
+            self.db.delete_report(report_id)
+            self.reset_page()
+            self.create_menu()
+            self.create_table_layout()
         
 if __name__ == "__main__":
     app = AllReportsPage()
