@@ -1,3 +1,4 @@
+import re
 import tkinter as tk
 from tkinter import StringVar, ttk, messagebox, Entry
 import sqlite3
@@ -138,17 +139,26 @@ class AllReportsPage(tk.Tk):
         self.phoneNo_var = StringVar(value=self.user[3])
         self.phoneNo_entry = Entry(edit_user_window, textvariable=self.phoneNo_var, width=40)
         self.phoneNo_entry.pack()
-
-        tk.Button(edit_user_window, text="Save", command=self.save_user, bg="green", fg="white", width=15).pack()
+        
+        tk.Button(edit_user_window, text="Save", command=self.save_user, bg="green", fg="white", width=15).pack(pady=10)
         
     def save_user(self):
+
 
         username = self.username_var.get()
         password = self.password_var.get()
         phoneNo = self.phoneNo_var.get()
 
+        if(username == "" or password == "" or phoneNo == ""):
+            messagebox.showerror("Error", "Please fill every user data before saving!")
+            return
+        
         self.db.update_user(self.user_id,username,password,phoneNo)
         messagebox.showinfo("Success", "User updated successfully!")
+        self.user = [self.user_id, username, password, phoneNo]
+        
+        
+        
         
 
         
@@ -181,6 +191,22 @@ class AllReportsPage(tk.Tk):
             self.reset_page()
             self.create_menu()
             self.create_table_layout()
+            
+    #def checkEditInfo(self,username,password,phoneNo):
+    #    if (re.search("[A-Z]", password) and re.search("[a-z]", password) and re.search("[0-9]", password) and re.search("[]")):
+    #        
+    #        
+    #    
+     #   if(4 < len(username) > 12):
+    #        messagebox.showerror("Error", "Username is not valid!")
+    #    if(8 < len(password) > 16):
+    # #       messagebox.showerror("Error", "Password is not valid!")
+    #    if(len(phoneNo) != 10):
+     #       messagebox.showerror("Error", "Phone number is not valid!")
+    #        
+        
+
+        
         
 if __name__ == "__main__":
     app = AllReportsPage()
