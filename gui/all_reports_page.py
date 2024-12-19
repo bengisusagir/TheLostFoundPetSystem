@@ -47,8 +47,8 @@ class AllReportsPage(tk.Tk):
         # Profile Dropdown Menü
         profile_menu = ttk.Menubutton(menu_frame, text="Profile", direction="below")
         profile_dropdown = tk.Menu(profile_menu, tearoff=0)
-        profile_dropdown.add_command(label="Edit User", command=self.edit_user)
-        profile_dropdown.add_command(label="Delete User", command=self.delete_user)
+        profile_dropdown.add_command(label="Edit User", command=lambda: self.edit_user(self.user[0]))
+        profile_dropdown.add_command(label="Delete User", command=lambda: self.delete_user(self.user[0]))
         profile_menu["menu"] = profile_dropdown
         profile_menu.pack(side="right", padx=10)
         
@@ -117,7 +117,7 @@ class AllReportsPage(tk.Tk):
     def change_language(self):
         messagebox.showinfo("Language", "Change language to TR/EN")
 
-    def edit_user(self):
+    def edit_user(self, user_id):
         # Yeni pencere oluştur
         edit_user_window = tk.Toplevel(self)
         edit_user_window.title("Edit User")
@@ -128,15 +128,38 @@ class AllReportsPage(tk.Tk):
         self.username_var = StringVar(value=self.user[1])
         self.username_entry = Entry(edit_user_window, textvariable=self.username_var, width=40)
         self.username_entry.pack()
-        
 
+        tk.Label(edit_user_window, text="Password:").pack(pady=5)
+        self.password_var = StringVar(value=self.user[2])
+        self.password_entry = Entry(edit_user_window, textvariable=self.password_var, width=40)
+        self.password_entry.pack()
+
+        tk.Label(edit_user_window, text="Phone No:").pack(pady=5)
+        self.phoneNo_var = StringVar(value=self.user[3])
+        self.phoneNo_entry = Entry(edit_user_window, textvariable=self.phoneNo_var, width=40)
+        self.phoneNo_entry.pack()
+
+        tk.Button(edit_user_window, text="Save", command=self.save_user, bg="green", fg="white", width=15).pack()
+        
+    def save_user(self):
+
+        username = self.username_var.get()
+        password = self.password_var.get()
+        phoneNo = self.phoneNo_var.get()
+
+        self.db.update_user(self.user_id,username,password,phoneNo)
+        messagebox.showinfo("Success", "User updated successfully!")
+        
 
         
 
     def delete_user(self,user_id):
         if messagebox.askyesno("Delete User", "Are you sure you want to delete your account?"):
-            messagebox.showinfo("Delete User", "User account deleted")
             self.db.delete_user(user_id)
+            self.db.deleteAllReports(user_id)
+            messagebox.showinfo("Delete User", "User account deleted")
+            self.destroy()
+            
 
     def reset_page(self):
         for widget in self.winfo_children():
@@ -153,7 +176,7 @@ class AllReportsPage(tk.Tk):
         ReportDetails(report_details_window,report_id,self.editable)
         
     def delete_report(self,report_id):
-        if messagebox.askyesno("Delete User", "Are you sure you want to delete your account?"):
+        if messagebox.askyesno("Delete User", "Are you sure you want to delete your report?"):
             self.db.delete_report(report_id)
             self.reset_page()
             self.create_menu()
