@@ -87,16 +87,24 @@ class LostFoundDatabase:
         conn.close()
         return report_list
 
-    def delete_report(self, id):
+    def delete_report(self, report_id):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
-        cur.execute("delete from reports where id=?", (id,))
+        cur.execute("delete from reports where id=?", (report_id,))
         conn.commit()
         conn.close()
+        
+    def deleteAllReports(self, user_id):
+        conn = sqlite3.connect(self.db_name)
+        cur = conn.cursor()
+        cur.execute("delete from reports where user_id=?", (user_id,))
+        conn.commit()
+        conn.close()
+        
     def delete_user(self, id):
         conn = sqlite3.connect(self.db_name)
         cur = conn.cursor()
-        cur.execute("delete from users where id=?", (id))
+        cur.execute("delete from users where id=?", (id,))
         conn.commit()
         conn.close()
         
