@@ -12,19 +12,19 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import dblib 
 from languages import LANGUAGES
 
-# Ana Uygulama Sınıfı
 class App(tk.Tk):
-    def __init__(self,language = "tr"):
+    def __init__(self):
         super().__init__()
-        self.languageNo = 0 if language == "en" else 1
+        self.language = "tr"
+        self.languageNo = 0 if self.language == "en" else 1
         self.title(LANGUAGES["titleLogin"][self.languageNo])
         self.geometry("400x300")
         self.resizable(False, False)
         self.show_login_page()
         self.db = dblib.LostFoundDatabase()
+    
 
     def show_login_page(self):
-        # Login sayfası
         for widget in self.winfo_children():
             widget.destroy()
         tk.Label(self, text=LANGUAGES["login"][self.languageNo], font=("Arial", 20)).pack(pady=10)
@@ -38,21 +38,17 @@ class App(tk.Tk):
         password_entry.pack()
 
         
-
         def login_action():
             self.db.get_users()
             username = username_entry.get()
             password = password_entry.get()
-            languageTag = "en" if self.languageNo == 0 else "tr"
             user = self.db.get_userpass_by_username(username, password)
             
             if user:
-                messagebox.showinfo(LANGUAGES["success"][self.languageNo], f"{LANGUAGES["welcome"][self.languageNo]} {username}")
+                messagebox.showinfo(LANGUAGES["success"][self.languageNo], f"{LANGUAGES['welcome'][self.languageNo]} {username}")
                 self.destroy()
-                AllReportsPage(user,languageTag)
-                
-                
-                
+                AllReportsPage(user, self.language)
+
             else:
                 messagebox.showerror(LANGUAGES["error"][self.languageNo], LANGUAGES["invalidUsernameorPassword"][self.languageNo])
 
@@ -87,7 +83,6 @@ class App(tk.Tk):
             return True
 
     def show_register_page(self):
-        # Register sayfası
         for widget in self.winfo_children():
             widget.destroy()
         tk.Label(self, text=LANGUAGES["register"][self.languageNo], font=("Arial", 20)).pack(pady=10)
@@ -123,16 +118,18 @@ class App(tk.Tk):
         tk.Button(self, text=LANGUAGES["register"][self.languageNo], command=register_action).pack(pady=5)
         tk.Button(self, text=LANGUAGES["backtoLogin"][self.languageNo], command=self.show_login_page).pack()
 
-    def changeLanguage(self,lanuageNo):
-        print("baştaki " , self.languageNo)
-        
-        if(lanuageNo == 0):
-            self.lanuageNo = 1
-            print("sondaki 1" , self.languageNo)
+    def changeLanguage(self,languageNo):
+        if(languageNo == 0):
+            self.language = "tr"
+            self.languageNo = 0 if self.language == "en" else 1
+            self.title(LANGUAGES["titleLogin"][self.languageNo])
+            self.show_login_page()
         else:
-            self.lanuageNo = 0
-            print("sondaki 2" , self.languageNo)
-
+            self.language = "en"
+            self.languageNo = 0 if self.language == "en" else 1
+            self.title(LANGUAGES["titleLogin"][self.languageNo])
+            self.show_login_page()
+            
 if __name__ == "__main__":
     app = App()
     app.mainloop()
