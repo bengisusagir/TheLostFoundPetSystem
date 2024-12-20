@@ -27,16 +27,25 @@ class App(tk.Tk):
     def show_login_page(self):
         for widget in self.winfo_children():
             widget.destroy()
-        tk.Label(self, text=LANGUAGES["login"][self.languageNo], font=("Arial", 20)).pack(pady=10)
+        tk.Label(
+            self,
+            text=LANGUAGES["login"][self.languageNo],
+            font=("Arial", 18, "bold"),
+            bg="#4CAF50",
+            fg="white",
+            pady=10,
+        ).pack(fill="x")
 
-        tk.Label(self, text=LANGUAGES["username"][self.languageNo]).pack()
-        username_entry = tk.Entry(self, width=30)
-        username_entry.pack()
+        frame = tk.Frame(self, padx=20, pady=10)
+        frame.pack(expand=True)
 
-        tk.Label(self, text=LANGUAGES["password"][self.languageNo]).pack()
-        password_entry = tk.Entry(self, show="*", width=30)
-        password_entry.pack()
+        tk.Label(frame, text=LANGUAGES["username"][self.languageNo], font=("Arial", 12)).grid(row=0, column=0, sticky="w", pady=5)
+        username_entry = tk.Entry(frame, width=30)
+        username_entry.grid(row=0, column=1, pady=5)
 
+        tk.Label(frame, text=LANGUAGES["password"][self.languageNo], font=("Arial", 12)).grid(row=1, column=0, sticky="w", pady=5)
+        password_entry = tk.Entry(frame, show="*", width=30)
+        password_entry.grid(row=1, column=1, pady=5)
         
         def login_action():
             self.db.get_users()
@@ -52,12 +61,10 @@ class App(tk.Tk):
             else:
                 messagebox.showerror(LANGUAGES["error"][self.languageNo], LANGUAGES["invalidUsernameorPassword"][self.languageNo])
 
-        login_btn = tk.Button(self, text=LANGUAGES["login"][self.languageNo], command=login_action)
-        login_btn.pack(pady=5)
+        tk.Button(frame, text=LANGUAGES["login"][self.languageNo], command=login_action, width=15, bg="#4CAF50", fg="white").grid(row=2, column=1, pady=10)
+        tk.Button(frame, text=LANGUAGES["register"][self.languageNo], command=self.show_register_page, width=15).grid(row=3, column=1, pady=5)
 
-        tk.Button(self, text=LANGUAGES["register"][self.languageNo], command=self.show_register_page).pack()
-
-        tk.Button(self, text=LANGUAGES["change_language"][self.languageNo], command=lambda: self.changeLanguage(self.languageNo)).pack(pady=40)
+        tk.Button(self, text=LANGUAGES["change_language"][self.languageNo], command=lambda: self.changeLanguage(self.languageNo), width=20).pack(side="bottom", pady=10)
 
     def checkNewUserInfo(self,username,password,phoneNo):
             
@@ -85,20 +92,29 @@ class App(tk.Tk):
     def show_register_page(self):
         for widget in self.winfo_children():
             widget.destroy()
-        tk.Label(self, text=LANGUAGES["register"][self.languageNo], font=("Arial", 20)).pack(pady=10)
+        tk.Label(
+            self,
+            text=LANGUAGES["register"][self.languageNo],
+            font=("Arial", 18, "bold"),
+            bg="#4CAF50",
+            fg="white",
+            pady=10,
+        ).pack(fill="x")
 
-        tk.Label(self, text=LANGUAGES["username"][self.languageNo]).pack()
-        username_entry = tk.Entry(self, width=30)
-        username_entry.pack()
+        frame = tk.Frame(self, padx=20, pady=20)
+        frame.pack(expand=True)
 
-        tk.Label(self, text=LANGUAGES["password"][self.languageNo]).pack()
-        password_entry = tk.Entry(self, show="*", width=30)
-        password_entry.pack()
+        tk.Label(frame, text=LANGUAGES["username"][self.languageNo], font=("Arial", 12)).grid(row=0, column=0, sticky="w", pady=5)
+        username_entry = tk.Entry(frame, width=30)
+        username_entry.grid(row=0, column=1, pady=5)
 
-        tk.Label(self, text=LANGUAGES["phoneNo"][self.languageNo]).pack()
-        phoneNo_entry = tk.Entry(self, width=30)
-        phoneNo_entry.pack()
+        tk.Label(frame, text=LANGUAGES["password"][self.languageNo], font=("Arial", 12)).grid(row=1, column=0, sticky="w", pady=5)
+        password_entry = tk.Entry(frame, show="*", width=30)
+        password_entry.grid(row=1, column=1, pady=5)
 
+        tk.Label(frame, text=LANGUAGES["phoneNo"][self.languageNo], font=("Arial", 12)).grid(row=2, column=0, sticky="w", pady=5)
+        phoneNo_entry = tk.Entry(frame, width=30)
+        phoneNo_entry.grid(row=2, column=1, pady=5)
 
         def register_action():
             username = username_entry.get() 
@@ -115,8 +131,8 @@ class App(tk.Tk):
             else:
                 messagebox.showwarning(LANGUAGES["warning"][self.languageNo], LANGUAGES["allfields"][self.languageNo])
 
-        tk.Button(self, text=LANGUAGES["register"][self.languageNo], command=register_action).pack(pady=5)
-        tk.Button(self, text=LANGUAGES["backtoLogin"][self.languageNo], command=self.show_login_page).pack()
+        tk.Button(frame, text=LANGUAGES["register"][self.languageNo], command=register_action, width=15, bg="#4CAF50", fg="white").grid(row=3, column=1, pady=10)
+        tk.Button(frame, text=LANGUAGES["backtoLogin"][self.languageNo], command=self.show_login_page, width=15).grid(row=4, column=1, pady=5)
 
     def changeLanguage(self,languageNo):
         if(languageNo == 0):

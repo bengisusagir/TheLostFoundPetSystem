@@ -13,6 +13,7 @@ from languages import LANGUAGES
 class AllReportsPage(tk.Tk):
     def __init__(self,user,languageTag):
         super().__init__()
+        self.languageTag = languageTag
         self.languageNo = 0 if languageTag == "en" else 1
         self.title(LANGUAGES["titleAllReports"][self.languageNo])
         self.geometry("1000x600")
@@ -27,86 +28,88 @@ class AllReportsPage(tk.Tk):
         
         
     def create_menu(self):
-        # Üst menü çubuğu
-        menu_frame = tk.Frame(self, bg="lightgray", height=50)
+        menu_frame = tk.Frame(self, bg="white", height=50)
         menu_frame.pack(fill="x")
 
-        # Menü Butonları
         if(self.editable == False):
-            tk.Button(menu_frame, text=LANGUAGES["new_report"][self.languageNo], command=self.new_report).pack(side="left", padx=10, pady=10)
-            tk.Button(menu_frame, text=LANGUAGES["my_reports"][self.languageNo], command=self.my_reports).pack(side="left", padx=10)
-            tk.Button(menu_frame, text=LANGUAGES["all_reports"][self.languageNo], relief="sunken", command=self.all_reports).pack(side="left", padx=10)  # Seçili buton
-            tk.Button(menu_frame, text=LANGUAGES["change_language"][self.languageNo], command=lambda: self.change_language(self.languageNo)).pack(side="left", padx=10)
+            tk.Button(menu_frame, text=LANGUAGES["new_report"][self.languageNo], command=self.new_report, bg="#4CAF50", fg="white", font=("Arial", 12)).pack(side="left", padx=10, pady=10)
+            tk.Button(menu_frame, text=LANGUAGES["my_reports"][self.languageNo], command=self.my_reports, bg="#4CAF50", fg="white", font=("Arial", 12)).pack(side="left", padx=10, pady=10)
+            tk.Button(menu_frame, text=LANGUAGES["all_reports"][self.languageNo], relief="sunken", command=self.all_reports, bg="#4CAF50", fg="white", font=("Arial", 12)).pack(side="left", padx=10, pady=10)  # Selected button
+            tk.Button(menu_frame, text=LANGUAGES["change_language"][self.languageNo], command=lambda: self.change_language(self.languageTag), bg="#4CAF50", fg="white", font=("Arial", 12)).pack(side="left", padx=10, pady=10)
         else:
-            tk.Button(menu_frame, text=LANGUAGES["new_report"][self.languageNo], command=self.new_report).pack(side="left", padx=10, pady=10)
-            tk.Button(menu_frame, text=LANGUAGES["my_reports"][self.languageNo], relief="sunken", command=self.my_reports).pack(side="left", padx=10)  # Seçili buton
-            tk.Button(menu_frame, text=LANGUAGES["all_reports"][self.languageNo], command=self.all_reports).pack(side="left", padx=10)
-            tk.Button(menu_frame, text=LANGUAGES["change_language"][self.languageNo], command=lambda: self.change_language(self.languageNo)).pack(side="left", padx=10)
+            tk.Button(menu_frame, text=LANGUAGES["new_report"][self.languageNo], command=self.new_report, bg="#4CAF50", fg="white", font=("Arial", 12)).pack(side="left", padx=10, pady=10)
+            tk.Button(menu_frame, text=LANGUAGES["my_reports"][self.languageNo], relief="sunken" ,command=self.my_reports, bg="#4CAF50", fg="white", font=("Arial", 12)).pack(side="left", padx=10, pady=10)
+            tk.Button(menu_frame, text=LANGUAGES["all_reports"][self.languageNo], command=self.all_reports, bg="#4CAF50", fg="white", font=("Arial", 12)).pack(side="left", padx=10, pady=10)  # Selected button
+            tk.Button(menu_frame, text=LANGUAGES["change_language"][self.languageNo], command=lambda: self.change_language(self.languageTag), bg="#4CAF50", fg="white",  font=("Arial", 12)).pack(side="left", padx=10, pady=10)
         
 
-        # Profile Dropdown Menü
-        profile_menu = ttk.Menubutton(menu_frame, text=LANGUAGES["profile"][self.languageNo], direction="below")
-        profile_dropdown = tk.Menu(profile_menu, tearoff=0)
+        profile_menu = ttk.Menubutton(menu_frame, text=LANGUAGES["profile"][self.languageNo], direction="below", width=15)
+        profile_dropdown = tk.Menu(profile_menu, tearoff=0, bg="#4CAF50", fg="white", font=("Arial", 12))
         profile_dropdown.add_command(label=LANGUAGES["edit_user"][self.languageNo], command=lambda: self.edit_user(self.user[0]))
         profile_dropdown.add_command(label=LANGUAGES["delete_user"][self.languageNo], command=lambda: self.delete_user(self.user[0]))
         profile_menu["menu"] = profile_dropdown
         profile_menu.pack(side="right", padx=10)
-        
 
-    
+        
     def create_table_layout(self):
-        
-        # Ana sayfa içerik bölgesi
-        content_frame = tk.Frame(self)
-        content_frame.pack(fill="both", expand=True, padx=10, pady=10)
-
-        # 5 sütunlu grid yapısı
-        for i in range(5):
-            content_frame.columnconfigure(i, weight=1)
-        
-        # Boş 1. Sütun
-        tk.Label(content_frame, text="", bg="white").grid(row=0, column=0, sticky="nsew")
+        outer_frame = tk.Frame(self, bg="#f0f0f0")
+        outer_frame.pack(fill="both", expand=True, padx=10, pady=10)
     
-
-        if(self.editable == False):
+        canvas = tk.Canvas(outer_frame, bg="#f0f0f0")
+        canvas.pack(side="left", fill="both", expand=True)
+    
+        scrollbar = tk.Scrollbar(outer_frame, orient="vertical", command=canvas.yview)
+        scrollbar.pack(side="right", fill="y")
+    
+        canvas.configure(yscrollcommand=scrollbar.set)
+    
+        content_frame = tk.Frame(canvas, bg="#f0f0f0")
+        canvas.create_window((0, 0), window=content_frame, anchor="nw")
+    
+        def on_frame_configure(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+    
+        content_frame.bind("<Configure>", on_frame_configure)
+    
+        content_frame.columnconfigure(0, weight=1)
+        content_frame.columnconfigure(1, weight=1)
+        content_frame.columnconfigure(2, weight=1)
+        content_frame.columnconfigure(3, weight=1)
+        content_frame.columnconfigure(4, weight=1)
+    
+        tk.Label(content_frame, text="", bg="#f0f0f0").grid(row=0, column=0, sticky="nsew")
+    
+        if self.editable == False:
             reportInfo = self.db.get_reports()
         else:
             reportInfo = self.db.get_reports_by_user(self.user_id)
-
+    
         rowNumber = 0
-        
+    
         for report in reportInfo:
-            # İlan Detayları
-            
-            
-            tk.Label(content_frame, text=f"{LANGUAGES["pet_name"][self.languageNo]}: {report[2]}", font=("Arial", 12)).grid(row=rowNumber, column=1, sticky="w", padx=10, pady=5)
-            tk.Label(content_frame, text=f"{LANGUAGES["pet_type"][self.languageNo]}: {report[3]}", font=("Arial", 12)).grid(row=rowNumber + 1, column=1, sticky="w", padx=10, pady=5)
-            tk.Label(content_frame, text=f"{LANGUAGES["location"][self.languageNo]}: {report[4]}", font=("Arial", 12)).grid(row=rowNumber, column=2, sticky="w", padx=10, pady=5)
-            tk.Button(content_frame, text=f"{LANGUAGES["details_report"][self.languageNo]}", command=lambda r=report[0]: self.report_details(r)).grid(row=rowNumber + 1, column=2, sticky="w", padx=10, pady=5)
-            if(self.editable == True):
-                tk.Button(content_frame, text=f"{LANGUAGES["delete_report"][self.languageNo]}", command=lambda r=report[0]: self.delete_report(r)).grid(row=rowNumber + 1, column=2, sticky="w", padx=70, pady=5)
-            
-
-            # Fotoğraf Yer Tutucu
-            photo_path = report[6]  # Resim yolu
-            photo_label = self.display_image(content_frame, photo_path)  # Resmi içeren bir Label oluşturur
+            tk.Label(content_frame, text=f"{LANGUAGES['pet_name'][self.languageNo]} {report[2]}", font=("Arial", 12), bg="#f0f0f0", fg="black").grid(row=rowNumber, column=1, sticky="w", padx=10, pady=5)
+            tk.Label(content_frame, text=f"{LANGUAGES['pet_type'][self.languageNo]} {report[3]}", font=("Arial", 12), bg="#f0f0f0", fg="black").grid(row=rowNumber + 1, column=1, sticky="w", padx=10, pady=5)
+            tk.Label(content_frame, text=f"{LANGUAGES['location'][self.languageNo]} {report[4]}", font=("Arial", 12), bg="#f0f0f0", fg="black").grid(row=rowNumber, column=2, sticky="w", padx=10, pady=5)
+            tk.Button(content_frame, text=LANGUAGES['description'][self.languageNo], command=lambda r=report[0]: self.report_details(r), bg="#4CAF50", fg="white").grid(row=rowNumber + 1, column=2, sticky="w", padx=10, pady=5)
+    
+            if self.editable == True:
+                tk.Button(content_frame, text="Delete", command=lambda r=report[0]: self.delete_report(r), bg="red", fg="white").grid(row=rowNumber + 1, column=2, sticky="w", padx=80, pady=5)
+    
+            photo_path = report[6]
+            photo_label = self.display_image(content_frame, photo_path)
             photo_label.grid(row=rowNumber, column=3, rowspan=2, sticky="nsew", padx=10, pady=5)
-
-            # Çizgi (Separator)
+    
             separator = ttk.Separator(content_frame, orient="horizontal")
             separator.grid(row=rowNumber + 3, column=1, columnspan=3, sticky="ew", pady=5)
-            
+    
             rowNumber += 4
+    
+        tk.Label(content_frame, text="", bg="#f0f0f0").grid(row=0, column=4, sticky="nsew")
 
-
-            # Boş 5. Sütun
-            tk.Label(content_frame, text="", bg="white").grid(row=0, column=4, sticky="nsew")
-            
         
-    # Menü İşlevleri
     def new_report(self):
         new_report_window = tk.Toplevel(self)
-        ReportApp(new_report_window,self.user_id)
+        ReportApp(new_report_window,self.user_id,self.languageTag)
         
     def my_reports(self):
         self.reset_page()
@@ -116,14 +119,16 @@ class AllReportsPage(tk.Tk):
         self.create_table_layout()
         
 
-    def change_language(self,languageNo):
-        if(languageNo == 0):
+    def change_language(self,languageTag):
+        if(languageTag == "en"):
+            self.languageTag="tr"
             self.languageNo = 1
             self.reset_page()
             self.title(LANGUAGES["titleAllReports"][self.languageNo])
             self.create_menu()
             self.create_table_layout()
         else:
+            self.languageTag="en"
             self.languageNo = 0
             self.reset_page()
             self.title(LANGUAGES["titleAllReports"][self.languageNo])
@@ -131,29 +136,28 @@ class AllReportsPage(tk.Tk):
             self.create_table_layout()
 
     def edit_user(self, user_id):
-        # Yeni pencere oluştur
         edit_user_window = tk.Toplevel(self)
-        edit_user_window.title({LANGUAGES["edit_user"][self.languageNo]})
+        edit_user_window.title(LANGUAGES["edit_user"][self.languageNo])
         edit_user_window.geometry("300x250")
+        edit_user_window.config(bg="#f0f0f0") 
 
-        # Kullanıcı bilgileri için alanlar
-        tk.Label(edit_user_window, text= LANGUAGES["username"][self.languageNo]).pack(pady=5)
+        tk.Label(edit_user_window, text=LANGUAGES["username"][self.languageNo], bg="#f0f0f0", font=("Arial", 12)).pack(pady=5)
         self.username_var = StringVar(value=self.user[1])
-        self.username_entry = Entry(edit_user_window, textvariable=self.username_var, width=40)
-        self.username_entry.pack()
+        self.username_entry = Entry(edit_user_window, textvariable=self.username_var, width=40, font=("Arial", 12))
+        self.username_entry.pack(pady=5)
 
-        tk.Label(edit_user_window, text=LANGUAGES["password"][self.languageNo]).pack(pady=5)
+        tk.Label(edit_user_window, text=LANGUAGES["password"][self.languageNo], bg="#f0f0f0", font=("Arial", 12)).pack(pady=5)
         self.password_var = StringVar(value=self.user[2])
-        self.password_entry = Entry(edit_user_window, textvariable=self.password_var, width=40)
-        self.password_entry.pack()
+        self.password_entry = Entry(edit_user_window, textvariable=self.password_var, width=40, font=("Arial", 12))
+        self.password_entry.pack(pady=5)
 
-        tk.Label(edit_user_window, text=LANGUAGES["phoneNo"][self.languageNo]).pack(pady=5)
+        tk.Label(edit_user_window, text=LANGUAGES["phoneNo"][self.languageNo], bg="#f0f0f0", font=("Arial", 12)).pack(pady=5)
         self.phoneNo_var = StringVar(value=self.user[3])
-        self.phoneNo_entry = Entry(edit_user_window, textvariable=self.phoneNo_var, width=40)
-        self.phoneNo_entry.pack()
-        
-        tk.Button(edit_user_window, text=LANGUAGES["save"][self.languageNo], command=self.save_user, bg="green", fg="white", width=15).pack(pady=10)
-        
+        self.phoneNo_entry = Entry(edit_user_window, textvariable=self.phoneNo_var, width=40, font=("Arial", 12))
+        self.phoneNo_entry.pack(pady=5)
+
+        tk.Button(edit_user_window, text=LANGUAGES["save"][self.languageNo], command=self.save_user, bg="#4CAF50", fg="white", width=15, font=("Arial", 12)).pack(pady=10)
+
     def save_user(self):
 
 
@@ -199,7 +203,7 @@ class AllReportsPage(tk.Tk):
 
     def report_details(self,report_id):
         report_details_window = tk.Toplevel(self)
-        ReportDetails(report_details_window,report_id,self.editable)
+        ReportDetails(report_details_window,report_id,self.editable,self.languageTag)
         
     def delete_report(self,report_id):
         if messagebox.askyesno(LANGUAGES["deleteTheReport"][self.languageNo], LANGUAGES["askDeleteReport"][self.languageNo]):
